@@ -412,6 +412,40 @@
             border-color: var(--forge-iron);
         }
         
+        /* ═══════════════ PRO BADGE ═══════════════ */
+        
+        .pro-badge {
+            background: linear-gradient(135deg, var(--forge-ember) 0%, var(--forge-flame) 100%);
+            color: var(--forge-void);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: var(--font-display);
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: var(--space-xs);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pro-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
         /* ═══════════════ DETAILS/SUMMARY ═══════════════ */
         
         details {
@@ -470,6 +504,96 @@
             max-height: 150px;
             margin-top: var(--space-md);
             border-radius: var(--radius-sm);
+        }
+        
+        /* ═══════════════ PRO FEATURES SECTION ═══════════════ */
+        
+        .pro-features-section {
+            margin-top: var(--space-lg);
+            padding-top: var(--space-lg);
+            border-top: 1px solid var(--forge-steel);
+        }
+        
+        .pro-features-section h3 {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--forge-ember);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: var(--space-md);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+        
+        .pro-features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .pro-feature-card {
+            background: var(--forge-gunmetal);
+            border: 1px solid var(--forge-steel);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        
+        .pro-feature-card:hover {
+            border-color: var(--forge-ember);
+            transform: translateY(-2px);
+        }
+        
+        .pro-feature-card .icon {
+            font-size: 1.5rem;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .pro-feature-card h4 {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            color: var(--forge-white);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .pro-feature-card p {
+            font-size: 0.75rem;
+            color: var(--forge-silver);
+        }
+        
+        .pro-cta-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-lg);
+            flex-wrap: wrap;
+            padding: var(--space-md);
+            background: var(--forge-gunmetal);
+            border-radius: var(--radius-md);
+        }
+        
+        .pro-price {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--forge-ember);
+        }
+        
+        .pro-price span {
+            font-size: 0.85rem;
+            color: var(--forge-silver);
+            font-weight: 400;
+        }
+        
+        .pro-cta-bar .btn-primary {
+            text-decoration: none;
         }
         
         /* ═══════════════ EXPORT SECTION ═══════════════ */
@@ -546,6 +670,97 @@
         }
         
         .saved-swatch { flex: 1; }
+        
+        /* ═══════════════ MODAL ═══════════════ */
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 11, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--forge-charcoal);
+            border: 1px solid var(--forge-steel);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+        }
+        
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--forge-ember), var(--forge-flame));
+        }
+        
+        .modal-content h3 {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            color: var(--forge-white);
+            margin: 0 0 var(--space-md);
+        }
+        
+        .modal-price {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--forge-ember);
+            margin: var(--space-md) 0;
+        }
+        
+        .modal-price span {
+            font-size: 1rem;
+            color: var(--forge-silver);
+            font-weight: 400;
+        }
+        
+        .modal-features {
+            list-style: none;
+            padding: 0;
+            margin: var(--space-md) 0;
+        }
+        
+        .modal-features li {
+            padding: var(--space-sm) 0;
+            color: var(--forge-chrome);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .modal-features li::before {
+            content: '✓';
+            color: var(--forge-success);
+            font-weight: bold;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+        
+        .modal-actions .btn {
+            flex: 1;
+        }
         
         /* ═══════════════ FOOTER ═══════════════ */
         
@@ -672,6 +887,37 @@
                 <pre id="export-output" style="display: none;"></pre>
             </div>
             
+            <!-- Pro Features Section -->
+            <div class="pro-features-section">
+                <h3>Pro Features <span class="pro-badge" onclick="showProModal()">✨ PRO</span></h3>
+                <div class="pro-features-grid">
+                    <div class="pro-feature-card" onclick="showProModal()">
+                        <div class="icon">📤</div>
+                        <h4>Export Formats</h4>
+                        <p>ASE, Sketch, Figma</p>
+                    </div>
+                    <div class="pro-feature-card" onclick="showProModal()">
+                        <div class="icon">♿</div>
+                        <h4>Accessibility</h4>
+                        <p>WCAG contrast check</p>
+                    </div>
+                    <div class="pro-feature-card" onclick="showProModal()">
+                        <div class="icon">🌈</div>
+                        <h4>Gradients</h4>
+                        <p>CSS gradient gen</p>
+                    </div>
+                    <div class="pro-feature-card" onclick="showProModal()">
+                        <div class="icon">📊</div>
+                        <h4>Unlimited</h4>
+                        <p>Saved palettes</p>
+                    </div>
+                </div>
+                <div class="pro-cta-bar">
+                    <div class="pro-price">$2.99 <span>one-time</span></div>
+                    <a href="https://buy.stripe.com/5kQ8wIdxLdfp1Yl3131gs03" class="btn btn-primary" target="_blank">Unlock Pro</a>
+                </div>
+            </div>
+            
             <div class="saved-palettes" id="saved-palettes" style="display: none;">
                 <h3>Saved Palettes</h3>
                 <div id="saved-list"></div>
@@ -679,6 +925,25 @@
             </div>
         </div>
     </main>
+    
+    <!-- Pro Modal -->
+    <div class="modal" id="proModal">
+        <div class="modal-content">
+            <h3>🎨 ColorForge Pro</h3>
+            <div class="modal-price">$2.99 <span>one-time</span></div>
+            <ul class="modal-features">
+                <li>Export to ASE, Sketch, Figma</li>
+                <li>Accessibility/WCAG contrast checker</li>
+                <li>CSS gradient generator</li>
+                <li>Unlimited saved palettes</li>
+                <li>Priority support</li>
+            </ul>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeProModal()">Maybe Later</button>
+                <a href="https://buy.stripe.com/5kQ8wIdxLdfp1Yl3131gs03" class="btn btn-primary" style="text-decoration:none;text-align:center;" target="_blank">Upgrade — $2.99</a>
+            </div>
+        </div>
+    </div>
     
     <footer class="forge-footer">
         <div class="forge-footer-inner">
@@ -920,6 +1185,21 @@
             };
             reader.readAsDataURL(file);
         }
+        
+        function showProModal() {
+            document.getElementById('proModal').classList.add('active');
+        }
+        
+        function closeProModal() {
+            document.getElementById('proModal').classList.remove('active');
+        }
+        
+        // Close modal on outside click
+        document.getElementById('proModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('proModal')) {
+                closeProModal();
+            }
+        });
         
         // Initialize
         for (let i = 0; i < 5; i++) colors.push(generateColor());
