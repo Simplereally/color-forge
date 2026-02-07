@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Color Palette Generator — Create Beautiful Color Schemes | ColorForge</title>
+    <meta name="description" content="Generate stunning color palettes in seconds. Extract colors from images, explore harmonies, and export for design tools. Free, no signup.">
+    <meta name="keywords" content="color palette generator, color scheme generator, color picker, design colors, extract colors from image">
+    
+    <meta property="og:title" content="Free Color Palette Generator | ColorForge">
+    <meta property="og:description" content="Generate beautiful color palettes instantly. Free, no signup.">
+    <meta property="og:type" content="website">
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "ColorForge",
+        "description": "Free color palette generator for designers",
+        "applicationCategory": "DesignApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}
+    }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        :root { --pico-font-size: 16px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
+        .hero { text-align: center; margin-bottom: 2rem; }
+        .palette-display { display: flex; gap: 0; border-radius: 12px; overflow: hidden; margin: 1.5rem 0; min-height: 200px; }
+        .color-swatch { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; padding: 1rem; cursor: pointer; transition: transform 0.2s; position: relative; }
+        .color-swatch:hover { transform: scaleY(1.05); z-index: 1; }
+        .color-info { background: rgba(255,255,255,0.9); color: #333; padding: 0.5rem; border-radius: 6px; text-align: center; font-family: monospace; font-size: 0.85rem; }
+        .color-info.light { background: rgba(0,0,0,0.7); color: #fff; }
+        .controls { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin: 1.5rem 0; }
+        .controls button { flex: 0 0 auto; }
+        .harmony-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0; justify-content: center; }
+        .harmony-tabs button { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        .harmony-tabs button.active { background: var(--pico-primary); color: white; }
+        .harmony-tabs button:not(.active) { background: var(--pico-secondary-background); }
+        .export-section { background: var(--pico-card-background-color); padding: 1.5rem; border-radius: 8px; margin-top: 2rem; }
+        .export-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .export-option { text-align: center; padding: 1rem; }
+        .saved-palettes { margin-top: 2rem; }
+        .saved-palette { display: flex; gap: 2px; border-radius: 6px; overflow: hidden; margin-bottom: 0.5rem; height: 40px; cursor: pointer; }
+        .saved-swatch { flex: 1; }
+        .image-upload { text-align: center; margin: 1rem 0; padding: 2rem; border: 2px dashed var(--pico-muted-border-color); border-radius: 8px; }
+        #image-preview { max-width: 200px; max-height: 150px; margin-top: 1rem; border-radius: 8px; }
+        .lock-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 0.8rem; }
+        .lock-btn.locked { background: rgba(255,0,0,0.7); }
+        footer { text-align: center; margin-top: 3rem; color: var(--pico-muted-color); }
+        @media (max-width: 600px) { .palette-display { flex-direction: column; min-height: 400px; } .color-swatch { min-height: 80px; } }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="hero">
+            <h1>🎨 ColorForge</h1>
+            <p>Generate Beautiful Color Palettes — Press Spacebar for New Colors</p>
+        </div>
+        
+        <div class="harmony-tabs">
+            <button class="active" data-harmony="random">Random</button>
+            <button data-harmony="analogous">Analogous</button>
+            <button data-harmony="complementary">Complementary</button>
+            <button data-harmony="triadic">Triadic</button>
+            <button data-harmony="monochromatic">Monochromatic</button>
+        </div>
+        
+        <div class="palette-display" id="palette"></div>
+        
+        <div class="controls">
+            <button onclick="generatePalette()">🔄 Generate (Space)</button>
+            <button onclick="savePalette()" class="secondary">💾 Save</button>
+            <button onclick="copyAllColors()" class="secondary">📋 Copy All</button>
+        </div>
+        
+        <details>
+            <summary>🖼️ Extract from Image</summary>
+            <div class="image-upload">
+                <input type="file" id="image-input" accept="image/*" onchange="extractFromImage(event)">
+                <p>Upload an image to extract its color palette</p>
+                <img id="image-preview" style="display: none;">
+            </div>
+        </details>
+        
+        <div class="export-section">
+            <h3>Export Palette</h3>
+            <div class="export-grid">
+                <div class="export-option">
+                    <button onclick="exportAs('css')" class="secondary">CSS Variables</button>
+                </div>
+                <div class="export-option">
+                    <button onclick="exportAs('scss')" class="secondary">SCSS Variables</button>
+                </div>
+                <div class="export-option">
+                    <button onclick="exportAs('tailwind')" class="secondary">Tailwind Config</button>
+                </div>
+                <div class="export-option">
+                    <button onclick="exportAs('json')" class="secondary">JSON</button>
+                </div>
+            </div>
+            <pre id="export-output" style="display: none; margin-top: 1rem; overflow-x: auto;"></pre>
+        </div>
+        
+        <div class="saved-palettes" id="saved-palettes" style="display: none;">
+            <h3>Saved Palettes</h3>
+            <div id="saved-list"></div>
+            <button onclick="clearSaved()" class="secondary" style="margin-top: 0.5rem; font-size: 0.9rem;">Clear All</button>
+        </div>
+        
+        <footer>
+            <p>Built with ❤️ by <a href="https://github.com/Simplereally">Simplereally</a></p>
+            <p>Part of the <a href="https://simplereally.github.io/invoice-forge/">Forge</a> tool collection</p>
+        </footer>
+    </main>
+    
+    <script>
+        let colors = [];
+        let locked = [false, false, false, false, false];
+        let harmony = 'random';
+        let savedPalettes = JSON.parse(localStorage.getItem('colorforge_palettes') || '[]');
+        
+        document.querySelectorAll('.harmony-tabs button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.harmony-tabs button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                harmony = btn.dataset.harmony;
+                generatePalette();
+            });
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+                e.preventDefault();
+                generatePalette();
+            }
+        });
+        
+        function hslToHex(h, s, l) {
+            s /= 100; l /= 100;
+            const a = s * Math.min(l, 1 - l);
+            const f = n => {
+                const k = (n + h / 30) % 12;
+                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                return Math.round(255 * color).toString(16).padStart(2, '0');
+            };
+            return `#${f(0)}${f(8)}${f(4)}`;
+        }
+        
+        function hexToHsl(hex) {
+            let r = parseInt(hex.slice(1, 3), 16) / 255;
+            let g = parseInt(hex.slice(3, 5), 16) / 255;
+            let b = parseInt(hex.slice(5, 7), 16) / 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) { h = s = 0; }
+            else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+            return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+        }
+        
+        function generateColor() {
+            const h = Math.random() * 360;
+            const s = 50 + Math.random() * 40;
+            const l = 30 + Math.random() * 40;
+            return hslToHex(h, s, l);
+        }
+        
+        function generatePalette() {
+            const baseHue = Math.random() * 360;
+            const baseSat = 50 + Math.random() * 30;
+            const baseLit = 40 + Math.random() * 20;
+            
+            for (let i = 0; i < 5; i++) {
+                if (locked[i]) continue;
+                
+                let h, s, l;
+                switch (harmony) {
+                    case 'analogous':
+                        h = (baseHue + (i - 2) * 30) % 360;
+                        s = baseSat + (Math.random() - 0.5) * 20;
+                        l = baseLit + (i - 2) * 8;
+                        break;
+                    case 'complementary':
+                        h = i < 3 ? baseHue : (baseHue + 180) % 360;
+                        s = baseSat + (Math.random() - 0.5) * 20;
+                        l = baseLit + (Math.random() - 0.5) * 30;
+                        break;
+                    case 'triadic':
+                        h = (baseHue + (i % 3) * 120) % 360;
+                        s = baseSat + (Math.random() - 0.5) * 20;
+                        l = baseLit + (Math.random() - 0.5) * 30;
+                        break;
+                    case 'monochromatic':
+                        h = baseHue;
+                        s = baseSat + (Math.random() - 0.5) * 15;
+                        l = 20 + i * 15;
+                        break;
+                    default:
+                        h = Math.random() * 360;
+                        s = 50 + Math.random() * 40;
+                        l = 30 + Math.random() * 40;
+                }
+                colors[i] = hslToHex(Math.abs(h) % 360, Math.max(20, Math.min(100, s)), Math.max(15, Math.min(85, l)));
+            }
+            renderPalette();
+        }
+        
+        function renderPalette() {
+            const palette = document.getElementById('palette');
+            palette.innerHTML = colors.map((color, i) => {
+                const [h, s, l] = hexToHsl(color);
+                const isLight = l > 50;
+                return `
+                    <div class="color-swatch" style="background: ${color};" onclick="copyColor('${color}')">
+                        <button class="lock-btn ${locked[i] ? 'locked' : ''}" onclick="event.stopPropagation(); toggleLock(${i})">
+                            ${locked[i] ? '🔒' : '🔓'}
+                        </button>
+                        <div class="color-info ${isLight ? 'light' : ''}">${color.toUpperCase()}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function toggleLock(i) {
+            locked[i] = !locked[i];
+            renderPalette();
+        }
+        
+        function copyColor(color) {
+            navigator.clipboard.writeText(color);
+            const info = event.target.closest('.color-swatch').querySelector('.color-info');
+            const original = info.textContent;
+            info.textContent = 'Copied!';
+            setTimeout(() => info.textContent = original, 1000);
+        }
+        
+        function copyAllColors() {
+            navigator.clipboard.writeText(colors.join(', '));
+            alert('All colors copied to clipboard!');
+        }
+        
+        function savePalette() {
+            savedPalettes.unshift([...colors]);
+            if (savedPalettes.length > 10) savedPalettes.pop();
+            localStorage.setItem('colorforge_palettes', JSON.stringify(savedPalettes));
+            renderSaved();
+        }
+        
+        function loadPalette(palette) {
+            colors = [...palette];
+            locked = [false, false, false, false, false];
+            renderPalette();
+        }
+        
+        function renderSaved() {
+            if (savedPalettes.length === 0) {
+                document.getElementById('saved-palettes').style.display = 'none';
+                return;
+            }
+            document.getElementById('saved-palettes').style.display = 'block';
+            document.getElementById('saved-list').innerHTML = savedPalettes.map((p, i) => `
+                <div class="saved-palette" onclick="loadPalette(${JSON.stringify(p).replace(/"/g, '&quot;')})">
+                    ${p.map(c => `<div class="saved-swatch" style="background: ${c};"></div>`).join('')}
+                </div>
+            `).join('');
+        }
+        
+        function clearSaved() {
+            savedPalettes = [];
+            localStorage.removeItem('colorforge_palettes');
+            renderSaved();
+        }
+        
+        function exportAs(format) {
+            const output = document.getElementById('export-output');
+            let text = '';
+            switch (format) {
+                case 'css':
+                    text = `:root {\n${colors.map((c, i) => `  --color-${i + 1}: ${c};`).join('\n')}\n}`;
+                    break;
+                case 'scss':
+                    text = colors.map((c, i) => `$color-${i + 1}: ${c};`).join('\n');
+                    break;
+                case 'tailwind':
+                    text = `module.exports = {\n  theme: {\n    extend: {\n      colors: {\n${colors.map((c, i) => `        'brand-${i + 1}': '${c}',`).join('\n')}\n      }\n    }\n  }\n}`;
+                    break;
+                case 'json':
+                    text = JSON.stringify({ colors: colors.map((c, i) => ({ name: `color-${i + 1}`, hex: c })) }, null, 2);
+                    break;
+            }
+            output.textContent = text;
+            output.style.display = 'block';
+            navigator.clipboard.writeText(text);
+        }
+        
+        function extractFromImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('image-preview');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const image = new Image();
+                image.onload = function() {
+                    canvas.width = 50;
+                    canvas.height = 50;
+                    ctx.drawImage(image, 0, 0, 50, 50);
+                    const data = ctx.getImageData(0, 0, 50, 50).data;
+                    
+                    const colorCounts = {};
+                    for (let i = 0; i < data.length; i += 4) {
+                        const r = Math.round(data[i] / 32) * 32;
+                        const g = Math.round(data[i + 1] / 32) * 32;
+                        const b = Math.round(data[i + 2] / 32) * 32;
+                        const hex = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+                        colorCounts[hex] = (colorCounts[hex] || 0) + 1;
+                    }
+                    
+                    const sorted = Object.entries(colorCounts).sort((a, b) => b[1] - a[1]);
+                    colors = sorted.slice(0, 5).map(([hex]) => hex);
+                    while (colors.length < 5) colors.push(generateColor());
+                    locked = [false, false, false, false, false];
+                    renderPalette();
+                };
+                image.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Initialize
+        for (let i = 0; i < 5; i++) colors.push(generateColor());
+        renderPalette();
+        renderSaved();
+    </script>
+</body>
+</html>
